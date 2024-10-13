@@ -203,7 +203,6 @@ class Tutor():
             print("USER WITH SKILL USER WITH SKILL USER WITH SKILL:   " + user.first_name)
 
         return render_template("searchedTutors.html",usersWithSpecifiedSkill=usersWithSpecifiedSkill)
-        #results = [{'first_name': user.first_name} for user in users_with_skill]
 
 
 #Runs the program
