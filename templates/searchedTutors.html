@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="{{ url_for('static', filename='searchScript.js') }}"></script>
+    </head> 
+    <style>
+        /* Basic table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Merge borders */
+        }
+
+        th, td {
+            border: 1px solid black; /* Black border for cells */
+            padding: 8px; /* Padding for cells */
+            text-align: left; /* Left align text */
+        }
+
+        th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+        }
+    </style>
+    <body>
+        <table>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Skills</th>
+            </tr>
+    
+            {%for user in usersWithSpecifiedSkill%}
+                <tr>
+                    <th>{{user.first_name}}</th>
+                    <th>{{user.last_name}}</th>
+                    <th>
+                        {%for skill in user.skills%}
+                            {{skill.skills}}
+                            {% if not loop.last %},{% endif %}
+                        {%endfor%}
+                    </th>
+                </tr>
+            {%endfor%}
+        </table>
+    </body>
+</html>

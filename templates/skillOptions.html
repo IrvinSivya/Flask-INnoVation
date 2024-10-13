@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Dropdown Menu</title>
+</head>
+<body>
+
+    <form action="addSkill" method="POST">
+        <div class="dropdown">
+            <select name="subject" class="dropbtn" required>
+                <option value="" disabled selected>Select Subject</option>
+                <option value="chemistry">Chemistry</option>
+                <option value="physics">Physics</option>
+                <option value="biology">Biology</option>
+                <option value="math">Math</option>
+                <option value="history">History</option>
+                <option value="geography">Geography</option>
+                <option value="computer science">Computer Science</option>
+                <option value="english">English</option>
+                <option value="art">Art</option>
+                <option value="physical education">Physical Education</option>
+            </select>
+        </div>
+        <button type="submit">Submit</button>
+
+        <a href = "{{url_for('main')}}">
+            <button value = "btn btn-primary">Go back to Home</button>
+        </a>
+    </form>
+</body>
+</html>

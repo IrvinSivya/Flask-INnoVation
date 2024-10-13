@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="{{ url_for('static', filename='searchScript.js') }}"></script>
+    </head> 
+    <body>
+        <h1>Find a tutor:</h1>
+
+        <input type="text" id="search-bar" placeholder="Enter a skill">
+        <div id="tutor-container"></div>
+
+        <form action = "{{url_for('main')}}" method = "post">
+            <button class = "btn btn-primary">Back to Home</button>
+        </form>     
+    </body>
+</html>
