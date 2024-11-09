@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Skill Swap Hub</title>
+    <title>User Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -49,19 +49,26 @@
             color: #333;
             font-size: 28px;
         }
-        .activity {
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 75px;
+            margin-bottom: 20px;
+            border: 3px solid #005B96;
+        }
+        .section {
             margin-bottom: 20px;
             padding: 15px;
             background: #E8F0FE;
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        .activity h3 {
+        .section h3 {
             margin: 0 0 10px;
             color: #005B96;
         }
-        .activity p {
-            margin: 0;
+        .section p {
+            margin: 5px 0;
             color: #555;
         }
     </style>
@@ -76,23 +83,26 @@
         <a href="{{url_for('logout')}}">Logout</a>
     </div>
     <div class="main-content">
-        <h1>Welcome to the Student Skill Swap Hub</h1>
+        <h1>User Profile</h1>
+        <img src="C:\Users\Nikol\Downloads\supericon.png" alt="Profile Picture" class="profile-picture"> <!-- Replace with actual image source -->
 
-        <div class="activity">
-            <h3>Recent Skill Swaps</h3>
-            <p>Check out the latest skill exchanges between students!</p>
+        <div class="section">
+            <h3>Awards</h3>
+            <p>1. </p>
+            <p>2. </p>
+            <p>3. </p>
         </div>
-        <div class="activity">
-            <h3>Upcoming Events</h3>
-            <p>Join our next skill-sharing workshop on Wednesday!</p>
+
+        <div class="section">
+            <h3>Credentials</h3>
+            <p>1. </p>
+            <p>2. </p>
+            <p>3. </p>
         </div>
-        <div class="activity">
-            <h3>Featured Skills</h3>
-            <p>Discover new skills available for swapping this week.</p>
-        </div>
-        <div class="activity">
-            <h3>Community Announcements</h3>
-            <p>Stay tuned for updates and news from the Skill Swap community.</p>
+
+        <div class="section">
+            <h3>About Me</h3>
+            <p> </p>
         </div>
     </div>
 </body>

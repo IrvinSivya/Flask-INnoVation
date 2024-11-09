@@ -25,7 +25,6 @@ app.config['SECRET_KEY'] = 'wkhfwyufge671f8ouhewfvyft'
 
 db = SQLAlchemy(app)
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -58,7 +57,7 @@ with app.app_context():
 #Main page when not logged in
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("login.html")
 
 #Main page after logged in
 @app.route("/main", methods = ["GET","POST"])
@@ -68,7 +67,7 @@ def main():
 #SignUp class
 class signUp():
     #Sign up page
-    @app.route("/signUp", methods = ["POST"])
+    @app.route("/signUp", methods = ["POST","GET"])
     def signUp():
         return render_template("signUp.html")
 
@@ -127,7 +126,7 @@ class Logout():
     @app.route("/logout", methods = ["GET","POST"])
     def logout():
         logout_user()
-        return render_template("index.html")  
+        return render_template("login.html")  
 
 class ViewUsers():
     #View users page (this if for testing purposes only)
@@ -137,10 +136,21 @@ class ViewUsers():
         return render_template("viewUsers.html",users=users)
 
 class skills():
-    @app.route("/skillOptions", methods = ["GET","POST"])
+
+    @app.route("/userSkills", methods = ["GET","POST"])
     @login_required
-    def skillOptions():
-        return render_template("skillOptions.html")
+    def userSkills():
+        user_id = current_user.id
+        user_id = current_user.id
+        #gets user and their skills
+        user = User.query.get(user_id) #Gets the user
+        user_skills = Skill.query.filter(Skill.user_id == user.id).all() #Gets all the Skill objects 
+
+        current_skills = []
+        for skill in user_skills:
+            current_skills.append(skill.skills)
+
+        return render_template("userSkills.html", current_skills=current_skills)  
 
     #Adds the skill to the database
     @app.route("/addSkill", methods = ["GET","POST"])
@@ -175,6 +185,15 @@ class skills():
             return {"error": "Failed to add skill" + str(e)}, 500
                 
         return render_template("main.html")
+
+class Profile():
+    @app.route("/profile", methods = ["GET","POST"])
+    @login_required
+    def profile():
+        user_id = current_user.id
+        #gets user and their skills
+        user = User.query.get(user_id) #Gets the user
+        return render_template("profile.html")
 
 class Tutor():
     #Displays users with a skill

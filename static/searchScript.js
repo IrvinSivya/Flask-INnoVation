@@ -14,15 +14,16 @@ $(document).ready(function() {
       timeoutId = setTimeout(function() {
           if (skill_searched.length > 0) {
               $.ajax({
-                  url: '/searchTutors',
+                  url: "/searchTutors",
                   data: { skill_searched: skill_searched },
                   success: function(data) {
                       $('#tutor-container').html(data); // Update the table body with new results
                   }
               });
-          } else {
-              // Clear results if the input is empty
-              $('#tutor-container').html('');
+          } 
+          else {
+              //$('#tutor-container').html('');
+            window.location.href = '/getTutors';
           }
       }, 300); //300 ms delay
   });

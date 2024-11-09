@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Skills Showcase</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F4F4F4;
+            margin: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 120px; /* Adjusted width */
+            background: #005B96;
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar h2 {
+            color: #ffffff;
+            margin-top: 0;
+            font-size: 20px; /* Adjusted font size */
+        }
+        .sidebar a {
+            display: block;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            font-size: 14px; /* Adjusted font size */
+        }
+        .sidebar a:hover {
+            background-color: #004080;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-left: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            margin: 0 0 20px;
+            color: #333;
+            font-size: 28px;
+        }
+        .skill {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #E8F0FE;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .skill h3 {
+            margin: 0 0 10px;
+            color: #005B96;
+        }
+        h2 {
+            margin-top: 40 px;
+        }
+        .skill p {
+            margin: 0;
+            color: #555;
+        }
+
+        /*CSS FOR THE DROPDOWN AND SUBMIT BUTTON*/
+
+        .dropdown {
+            position: relative;
+            margin-bottom: 30px;
+            width: 250px;
+        }
+
+        /* Select dropdown styling */
+        .dropdown-select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            color: #333;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            cursor: pointer;
+            appearance: none; /* Removes default dropdown arrow in some browsers */
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* Focus effect on the select dropdown */
+        .dropdown-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+        }
+
+        /* New Submit Button Styling (Smaller & Nicer) */
+        .submit-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 22px; /* Smaller padding */
+            font-size: 14px; /* Smaller font */
+            border: 2px solid #3498db; /* Slightly darker green border */
+            border-radius: 30px; /* Fully rounded corners */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 160px; /* Fixed width for consistency */
+            text-transform: uppercase; /* Uppercase text */
+            font-weight: bold;
+        }
+
+        .submit-btn:hover {
+            background-color: #3498db;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+            border-color: #3498db; /* Lighter border on hover */
+        }
+
+        .submit-btn:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(46, 204, 113, 0.4);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Skill Swap Hub</h2>
+        <a href="{{url_for('main')}}">Home</a>
+        <a href="{{url_for('userSkills')}}">My Skills</a>
+        <a href="{{url_for('getTutors')}}">Find a Partner</a>
+        <a href="profile.html">Profile</a>
+        <a href="{{url_for('logout')}}">Logout</a>
+    </div>
+    <div class="main-content">
+        <h1>Your Achieved Skills</h1>
+
+        {%for skill in current_skills%}
+            <div class="skill">
+                <h3>{{skill|capitalize}}</h3>
+                <p>Level: Proficient</p>
+            </div>
+        {%endfor%}
+
+        <h2>Add Skill: </h2>
+        <form action="addSkill" method="POST">
+            <div class="dropdown">
+                <select name="subject" class="dropdown-select" required>
+                    <option value="" disabled selected>Select Subject</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="physics">Physics</option>
+                    <option value="biology">Biology</option>
+                    <option value="math">Math</option>
+                    <option value="history">History</option>
+                    <option value="geography">Geography</option>
+                    <option value="computer science">Computer Science</option>
+                    <option value="english">English</option>
+                    <option value="art">Art</option>
+                    <option value="physical education">Physical Education</option>
+                </select>
+            </div>
+            <button type="submit" class = "submit-btn">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
