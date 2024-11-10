@@ -1,10 +1,12 @@
 import os
 import folium
 
-from flask import Flask,render_template,request,flash,redirect
+from flask import Flask,render_template,request,flash,redirect,url_for
 from flask_login import current_user,login_user,logout_user,UserMixin,LoginManager,login_required
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
+
+from werkzeug.utils import secure_filename
 
 from sqlalchemy import create_engine
 from sqlalchemy import text
@@ -23,7 +25,17 @@ login_manager.login_view = "login"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://postgres:postgres@localhost:5432/InnovativeHacksUsers'
 app.config['SECRET_KEY'] = 'wkhfwyufge671f8ouhewfvyft'
 
+#Configuring upload folder and profile pic extensions
+UPLOAD_FOLDER = 'static/profile_pics'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['ALLOWED_EXTENSIONS'] = ALLOWED_EXTENSIONS
+
 db = SQLAlchemy(app)
+
+#Ensures the uploads folder exists
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -37,8 +49,12 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(50), nullable=False, unique=True)
     hashed_password = db.Column(db.String(255), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
+    profile_picture  = db.Column(db.String(1000))
+    about_me = db.Column(db.String(500))
+    phone_number = db.Column(db.String(15), unique=True)
 
     skills = db.relationship('Skill', backref='users', lazy=True)
+    achievements = db.relationship('Achievements', backref='users', lazy=True)
 
     #Overriding get_id since the id is named "user_id" instead of "id"
     def get_id(self):
@@ -48,6 +64,12 @@ class Skill(db.Model):
     __tablename__ = "skills"
     id = db.Column(db.Integer, primary_key=True)
     skills = db.Column(JSONB, default=list)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
+
+class Achievements(db.Model):
+    __tablename__ = "achievements"
+    id = db.Column(db.Integer, primary_key=True)
+    achievement = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) 
 
 #Creates the table
@@ -135,12 +157,10 @@ class ViewUsers():
         users = User.query.all()
         return render_template("viewUsers.html",users=users)
 
-class skills():
-
+class Skills():
     @app.route("/userSkills", methods = ["GET","POST"])
     @login_required
     def userSkills():
-        user_id = current_user.id
         user_id = current_user.id
         #gets user and their skills
         user = User.query.get(user_id) #Gets the user
@@ -187,13 +207,67 @@ class skills():
         return render_template("main.html")
 
 class Profile():
+    #Checks if the picture's extension is allowed
+    def allowed_file(filename):
+        return 
+
     @app.route("/profile", methods = ["GET","POST"])
     @login_required
     def profile():
         user_id = current_user.id
         #gets user and their skills
         user = User.query.get(user_id) #Gets the user
-        return render_template("profile.html")
+        user_profile = user.profile_picture
+        achievements = user.achievements
+        if user_profile is None:
+            user_profile="default.png"
+    
+        return render_template("profile.html",telephone_number = user.phone_number, about_me = user.about_me,isOthers=False,
+        achievements=achievements,username = user.first_name, user_profile=user_profile)
+
+    @app.route("/viewOthersProfile",methods = ["GET","POST"])
+    @login_required
+    def viewOthersProfile():
+        user_id = request.args.get('user_id')
+        user = User.query.get(user_id) #Gets the user
+        user_profile = user.profile_picture
+        achievements = user.achievements
+        if user_profile is None:
+            user_profile="default.png"
+        return render_template("profile.html",telephone_number = user.phone_number, about_me = user.about_me,
+        isOthers=True,achievements=achievements, username = user.first_name, user_profile=user_profile)
+    
+    @app.route("/uploadProfilePic", methods = ["GET","POST"])
+    @login_required
+    def uploadProfilePic():
+        user_id = current_user.id
+        user = User.query.get(user_id)
+
+        if 'file' not in request.files:
+            return redirect(url_for('profile'))
+
+        file = request.files['file']
+
+        allowed_file = '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+        
+        if file and allowed_file:
+            filename = secure_filename(file.filename)
+            
+            # Save the file in the upload folder
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(file_path)
+
+            user.profile_picture = filename
+
+            try:
+                db.session.commit()     
+                db.session.refresh(user)
+            except Exception as e:
+                db.session.rollback()
+                print("Error during commit:", str(e))
+                return {"error": "Failed to upload profile picture" + str(e)}, 500
+            
+            return redirect(url_for('profile'))
 
 class Tutor():
     #Displays users with a skill
@@ -223,6 +297,72 @@ class Tutor():
 
         return render_template("searchedTutors.html",usersWithSpecifiedSkill=usersWithSpecifiedSkill)
 
+class UserAchievements():
+    @app.route("/addAchievement", methods = ["GET","POST"])
+    @login_required
+    def addAchievement():
+        user_id = current_user.id
+        user = User.query.get(user_id)
+        new_achievement_str = request.form.get('new_achievement')
+
+        if(new_achievement_str is None):
+            return render_template("error.html", message="New achievement is null")
+
+        new_achievement = Achievements(achievement=new_achievement_str, user_id=user.id)
+        user.achievements.append(new_achievement)
+
+        try:
+            db.session.commit()     
+            db.session.refresh(user)
+        except Exception as e:
+            db.session.rollback()
+            print("Error during commit:", str(e))
+            return {"error": "Failed to add achievement" + str(e)}, 500
+        return redirect(url_for('profile'))
+
+class AboutMe():
+    @app.route("/aboutMe", methods = ["GET","POST"])
+    @login_required
+    def aboutMe():
+        user_id = current_user.id
+        user = User.query.get(user_id)
+        about_me = request.form.get('about_me')
+
+        if(about_me is None):
+            return render_template("error.html", message="About me is null")
+
+        user.about_me = about_me
+
+        try:
+            db.session.commit()     
+            db.session.refresh(user)
+        except Exception as e:
+            db.session.rollback()
+            print("Error during commit:", str(e))
+            return {"error": "Failed to add achievement" + str(e)}, 500
+        return redirect(url_for('profile'))
+
+class Telephone():
+    @app.route("/telephoneNumber", methods = ["GET","POST"])
+    @login_required
+    def telephoneNumber():
+        user_id = current_user.id
+        user = User.query.get(user_id)
+        telephone_number = request.form.get('telephone_number')
+
+        if(telephone_number is None):
+            return render_template("error.html", message="The Telephone number is null")
+
+        user.phone_number = telephone_number
+
+        try:
+            db.session.commit()     
+            db.session.refresh(user)
+        except Exception as e:
+            db.session.rollback()
+            print("Error during commit:", str(e))
+            return {"error": "Failed to add achievement" + str(e)}, 500
+        return redirect(url_for('profile'))
 
 #Runs the program
 if __name__ == "__main__":

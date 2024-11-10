@@ -79,31 +79,64 @@
         <a href="{{url_for('main')}}">Home</a>
         <a href="{{url_for('userSkills')}}">My Skills</a>
         <a href="{{url_for('getTutors')}}">Find a Partner</a>
-        <a href="{{url_for('profile')}}">Profile</a>
+        <a href="{{url_for('profile')}}">My Profile</a>
         <a href="{{url_for('logout')}}">Logout</a>
     </div>
     <div class="main-content">
-        <h1>User Profile</h1>
-        <img src="C:\Users\Nikol\Downloads\supericon.png" alt="Profile Picture" class="profile-picture"> <!-- Replace with actual image source -->
+        <h1>{{username}}'s Profile</h1>
+        <img src="{{url_for('static', filename='profile_pics/' + user_profile)}}" alt="Profile Picture" class="profile-picture"> <!-- Replace with actual image source -->
+
+        {%if isOthers==False%}
+            <form action="{{ url_for('uploadProfilePic') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="file">
+                <button type="submit">Upload</button>
+            </form>
+        {%endif%}
 
         <div class="section">
-            <h3>Awards</h3>
-            <p>1. </p>
-            <p>2. </p>
-            <p>3. </p>
+            <h3>Achievements</h3>
+            {%for achievement in achievements%}
+                <p>- {{achievement.achievement}}</p>
+            {%endfor%}
         </div>
 
-        <div class="section">
-            <h3>Credentials</h3>
-            <p>1. </p>
-            <p>2. </p>
-            <p>3. </p>
-        </div>
+        {%if isOthers==False%}
+            <form action="{{ url_for('addAchievement') }}" method="POST">
+                <label for="new_achievement">Add achievement:</label>
+                <input type="text" id="new_achievement" name="new_achievement" required maxlength="80" size="100">
+                <button type="submit">Submit</button>
+            </form>
+        {%endif%}
 
         <div class="section">
             <h3>About Me</h3>
-            <p> </p>
+            {%if about_me is not none%}
+                <p>{{about_me}}</p>
+            {%endif%}
         </div>
+
+        {%if isOthers==False%}
+            <form action="{{ url_for('aboutMe') }}" method="POST">
+                <label for="about_me">Edit About Me:</label>
+                <input type="text" id="about_me" name="about_me" maxlength="500" size="100" required>
+                <button type="submit">Submit</button>
+            </form>
+        {%endif%}
+
+        <div class="section">
+            <h3>Telephone Number</h3>
+            {%if telephone_number is not none%}
+                <p>{{telephone_number}}</p>
+            {%endif%}
+        </div>
+
+        {%if isOthers==False%}
+            <form action="{{ url_for('telephoneNumber') }}" method="POST">
+                <label for="telephone_number">Edit Telephone Number (No dashes):</label>
+                <input type="number" id="telephone_number" name="telephone_number" size="15" required>
+                <button type="submit">Submit</button>
+            </form>
+        {%endif%}
     </div>
 </body>
 </html>
